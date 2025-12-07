@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learn_widgets/widgets/1_text/1.learn_text_widget.dart';
-import 'package:learn_widgets/widgets/2_image/2.image_widget.dart';
+import 'package:learn_widgets/widgets/1_text/1_learn_text_widget.dart';
+import 'package:learn_widgets/widgets/2_image/2_image_widget.dart';
 
 void main(List<String> args) {
   runApp(MyApp());
