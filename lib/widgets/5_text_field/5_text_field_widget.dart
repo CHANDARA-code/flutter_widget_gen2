@@ -11,8 +11,13 @@ class TextFieldWidget extends StatefulWidget {
   State<TextFieldWidget> createState() => _TextFieldWidgetState();
 }
 
+final _formkey = GlobalKey<FormState>();
+
 class _TextFieldWidgetState extends State<TextFieldWidget> {
   bool _isObscureText = true;
+  String? _phoneNumber;
+  String? _email;
+  bool _isAllFieldHasValidValue = false;
   @override
   void initState() {
     super.initState();
@@ -113,6 +118,7 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                 }
                 return null;
               },
+
               decoration: InputDecoration(
                 labelText: "Password",
                 hintText: "123456",
@@ -130,59 +136,93 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
                 border: OutlineInputBorder(),
               ),
             ),
+            Form(
+              key: _formkey,
+              child: Column(
+                children: [
+                  Text("Input Type", style: TextStyle(fontSize: 32)),
+                  SizedBox(height: 12),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.phone,
+                    validator: (phone) {
+                      if (phone == null || phone.isEmpty) {
+                        return "Phone is required";
+                      }
 
-            Text("Input Type", style: TextStyle(fontSize: 32)),
-            SizedBox(height: 12),
-            TextFormField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              keyboardType: TextInputType.phone,
-              validator: (phone) {
-                if (phone == null || phone.isEmpty) {
-                  return "Phone is required";
-                }
+                      final regex = RegExp(r'^[0-9]{8,15}');
+                      if (!regex.hasMatch(phone)) {
+                        return "Phone Number is invalid";
+                      }
+                      _phoneNumber = phone;
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Phone",
+                      hintText: "017445647",
+                      prefixIcon: Icon(Icons.phone_android_outlined),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text("Email"),
+                  TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email is required';
+                      }
 
-                final regex = RegExp(r'^[0-9]{8,15}');
-                if (!regex.hasMatch(phone)) {
-                  return "Phone Number is invalid";
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                labelText: "Phone",
-                hintText: "017445647",
-                prefixIcon: Icon(Icons.phone_android_outlined),
-                border: OutlineInputBorder(),
+                      String pattern =
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+                      RegExp regExp = RegExp(pattern);
+
+                      if (!regExp.hasMatch(value)) {
+                        return 'Enter a valid email address';
+                      }
+                      _email = value;
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      hintText: "example@gmail.com",
+                      prefixIcon: Icon(Icons.phone_android_outlined),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: _onSubmitInformation,
+                    child: Text("Submit Information"),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 12),
-            Text("Email"),
-            TextFormField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email is required';
-                }
-
-                String pattern =
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                RegExp regExp = RegExp(pattern);
-
-                if (!regExp.hasMatch(value)) {
-                  return 'Enter a valid email address';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                labelText: "Email",
-                hintText: "example@gmail.com",
-                prefixIcon: Icon(Icons.phone_android_outlined),
-                border: OutlineInputBorder(),
-              ),
-            ),
+            !_isAllFieldHasValidValue
+                ? SizedBox.shrink()
+                : Text("Phone: $_phoneNumber Email: $_email"),
           ],
         ),
       ),
     );
+  }
+
+  _isHasValidValue({required bool isValidAndContainValue}) {
+    setState(() {
+      _isAllFieldHasValidValue = isValidAndContainValue;
+    });
+
+    // _isAllFieldHasValidValue = isValidAndContainValue;
+  }
+
+  _onSubmitInformation() {
+    final isFormFieldValid = _formkey.currentState?.validate();
+    print("isFormFiledVaid: $isFormFieldValid");
+    _isHasValidValue(isValidAndContainValue: false);
+    if (isFormFieldValid == false) return;
+    print("Phone: $_phoneNumber");
+    print("Email: $_email");
+    _isHasValidValue(isValidAndContainValue: true);
   }
 }
